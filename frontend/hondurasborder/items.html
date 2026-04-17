@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seized Items — HondurasBorder</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="announcement">
+    ⚠️ This is a demo transparency platform. Not affiliated with any government organization.
+  </div>
+
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">⚖️</div>
+        <div class="logo-text">
+          <h1>HondurasBorder</h1>
+          <p>Public Access Portal</p>
+        </div>
+      </a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="items.html" class="active">Seized Items</a>
+        <a href="about.html">About</a>
+        <a href="admin-login.html" class="nav-admin">Admin</a>
+      </nav>
+      <button class="mobile-menu-btn" onclick="openMobileNav()">☰</button>
+    </div>
+  </header>
+
+  <!-- Mobile Nav -->
+  <div class="mobile-nav-overlay" id="mobileOverlay" onclick="closeMobileNav()"></div>
+  <div class="mobile-nav-drawer" id="mobileDrawer">
+    <div class="drawer-header">
+      <span style="font-weight:700;color:var(--navy);font-size:16px;">Menu</span>
+      <button onclick="closeMobileNav()" style="background:none;border:none;font-size:22px;cursor:pointer;">✕</button>
+    </div>
+    <a href="index.html">🏠 Home</a>
+    <a href="items.html">📦 Seized Items</a>
+    <a href="about.html">ℹ️ About</a>
+    <a href="admin-login.html" style="color:var(--gold);font-weight:700;">🔐 Admin Portal</a>
+  </div>
+
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-header-inner">
+      <h1>Seized Items Database</h1>
+      <p>Browse all confiscated items in our public records.</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="section">
+
+    <!-- Filters -->
+    <div class="filters-bar">
+      <input type="text" class="filter-search" id="searchInput" placeholder="Search by name, ID, or description..." />
+
+      <div class="filter-row" style="margin-bottom: 12px;">
+        <span class="filter-label">Category:</span>
+        <button class="filter-btn active" onclick="setCategory('', this)">All</button>
+        <button class="filter-btn" onclick="setCategory('Vehicles', this)">Vehicles</button>
+        <button class="filter-btn" onclick="setCategory('Electronics', this)">Electronics</button>
+        <button class="filter-btn" onclick="setCategory('Jewelry', this)">Jewelry</button>
+        <button class="filter-btn" onclick="setCategory('Vessels', this)">Vessels</button>
+        <button class="filter-btn" onclick="setCategory('Luxury Goods', this)">Luxury Goods</button>
+        <button class="filter-btn" onclick="setCategory('Real Estate', this)">Real Estate</button>
+      </div>
+
+      <div class="filter-row">
+        <span class="filter-label">Status:</span>
+        <button class="filter-btn active" onclick="setStatus('', this)">All</button>
+        <button class="filter-btn" onclick="setStatus('Seized', this)">Seized</button>
+        <button class="filter-btn" onclick="setStatus('Under Review', this)">Under Review</button>
+        <button class="filter-btn" onclick="setStatus('Available', this)">Available</button>
+      </div>
+    </div>
+
+    <div class="results-count" id="resultsCount"></div>
+
+    <div class="cards-grid" id="itemsGrid">
+      <div class="loading">Loading items...</div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <h3>HondurasBorder</h3>
+        <p>The Seized Goods Transparency Platform provides public access to information about confiscated assets.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <a href="index.html">Home</a>
+        <a href="items.html">Browse Items</a>
+        <a href="about.html">About</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <p style="font-size:13.5px; line-height:1.8;">Use the messaging system on each item's detail page.</p>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 HondurasBorder Public Access Portal.</div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script>
+    // Mobile nav
+    function openMobileNav() {
+      document.getElementById('mobileOverlay').classList.add('open');
+      document.getElementById('mobileDrawer').classList.add('open');
+    }
+    function closeMobileNav() {
+      document.getElementById('mobileOverlay').classList.remove('open');
+      document.getElementById('mobileDrawer').classList.remove('open');
+    }
+
+    let activeCategory = '';
+    let activeStatus = '';
+
+    // Read URL params
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('search')) document.getElementById('searchInput').value = params.get('search');
+    if (params.get('category')) {
+      activeCategory = params.get('category');
+      document.querySelectorAll('.filter-row:first-of-type .filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent === activeCategory);
+      });
+    }
+
+    function renderItems() {
+      const search = document.getElementById('searchInput').value;
+      const items = DB.getItems({ search, category: activeCategory, status: activeStatus });
+      const grid = document.getElementById('itemsGrid');
+      document.getElementById('resultsCount').textContent = `${items.length} item(s) found`;
+
+      if (items.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1/-1;">
+            <div class="empty-icon">🔍</div>
+            <h3>No items found</h3>
+            <p>Try adjusting your search or filters</p>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = items.map(item => `
+        <a href="items-details.html?id=${item.id}" class="card">
+          <div class="card-img">
+            ${item.image
+              ? `<img src="${item.image}" alt="${item.title}" onerror="this.parentElement.innerHTML='<span style=font-size:48px>${DB.getCategoryMeta(item.category).icon}</span>'">`
+              : `<span style="font-size:48px">${DB.getCategoryMeta(item.category).icon}</span>`}
+          </div>
+          <div class="card-body">
+            <div class="card-top">
+              <span class="card-title">${item.title}</span>
+              <span class="badge ${DB.badgeClass(item.status)}">${item.status}</span>
+            </div>
+            <div class="card-id">${item.id}</div>
+            <div class="card-location">📍 ${item.location}</div>
+            <div class="card-value">${DB.formatCurrency(item.value)}</div>
+          </div>
+        </a>
+      `).join('');
+    }
+
+    function setCategory(cat, btn) {
+      activeCategory = cat;
+      btn.closest('.filter-row').querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderItems();
+    }
+
+    function setStatus(status, btn) {
+      activeStatus = status;
+      btn.closest('.filter-row').querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderItems();
+    }
+
+    document.getElementById('searchInput').addEventListener('input', renderItems);
+
+    renderItems();
+  </script>
+</body>
+</html>

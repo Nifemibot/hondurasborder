@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — HondurasBorder</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="announcement">
+    ⚠️ This is a demo transparency platform. Not affiliated with any government organization.
+  </div>
+
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">⚖️</div>
+        <div class="logo-text">
+          <h1>HondurasBorder</h1>
+          <p>Public Access Portal</p>
+        </div>
+      </a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="items.html">Seized Items</a>
+        <a href="about.html" class="active">About</a>
+        <a href="admin-login.html" class="nav-admin">Admin</a>
+      </nav>
+      <button class="mobile-menu-btn" onclick="openMobileNav()">☰</button>
+    </div>
+  </header>
+
+  <!-- Mobile Nav -->
+  <div class="mobile-nav-overlay" id="mobileOverlay" onclick="closeMobileNav()"></div>
+  <div class="mobile-nav-drawer" id="mobileDrawer">
+    <div class="drawer-header">
+      <span style="font-weight:700;color:var(--navy);font-size:16px;">Menu</span>
+      <button onclick="closeMobileNav()" style="background:none;border:none;font-size:22px;cursor:pointer;">✕</button>
+    </div>
+    <a href="index.html">🏠 Home</a>
+    <a href="items.html">📦 Seized Items</a>
+    <a href="about.html">ℹ️ About</a>
+    <a href="admin-login.html" style="color:var(--gold);font-weight:700;">🔐 Admin Portal</a>
+  </div>
+
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-header-inner">
+      <h1>About This Platform</h1>
+      <p>Learn about our mission to promote transparency and public access.</p>
+    </div>
+  </div>
+
+  <!-- About Section -->
+  <div class="section">
+    <div class="about-grid">
+      <div class="about-text">
+        <h2>Promoting Transparency in Asset Forfeiture</h2>
+        <p>The HondurasBorder Public Access Portal was created to give citizens direct access to information about confiscated assets held by border enforcement agencies. We believe that transparency is fundamental to public trust.</p>
+        <p>Our platform allows anyone to browse, search, and inquire about seized items — whether vehicles, electronics, jewelry, vessels, luxury goods, or real estate. Each item is documented with detailed descriptions, estimated values, and current status.</p>
+        <p>Members of the public, legal representatives, and journalists can use this portal to track asset forfeiture cases and submit inquiries about specific items through our secure messaging system.</p>
+      </div>
+      <div class="about-img">
+        <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&q=80" alt="Transparency in government" />
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Public Search</h3>
+        <p>Search and browse all seized items in our public database by category, status, location, or keyword.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <h3>Detailed Records</h3>
+        <p>Every item includes full documentation — case ID, estimated value, location, seizure date, and complete description.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <h3>Direct Inquiries</h3>
+        <p>Send questions directly about any specific item through our secure messaging system and receive official responses.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Secure Admin</h3>
+        <p>Authorized administrators can manage records, update item statuses, and respond to public inquiries securely.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Live Statistics</h3>
+        <p>Real-time statistics showing total items, current statuses, and aggregate values of all assets in the system.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚖️</div>
+        <h3>Legal Compliance</h3>
+        <p>All records are maintained in accordance with asset forfeiture transparency requirements and public records laws.</p>
+      </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div style="background: var(--off-white); border: 1.5px solid var(--gray-200); border-radius: var(--radius-lg); padding: 32px; margin-top: 60px;">
+      <h3 style="font-family:'Playfair Display',serif; color:var(--navy); margin-bottom:12px; font-size:20px;">⚠️ Important Disclaimer</h3>
+      <p style="color:var(--gray-600); font-size:14.5px; line-height:1.9;">
+        This is a <strong>demonstration platform only</strong>. All data displayed is fictional and for demonstration purposes. This platform is not affiliated with, endorsed by, or operated by any government organization, border enforcement agency, or law enforcement body. Any resemblance to real cases, persons, or properties is coincidental.
+      </p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <h3>HondurasBorder</h3>
+        <p>The Seized Goods Transparency Platform provides public access to information about confiscated assets. Demo platform only.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <a href="index.html">Home</a>
+        <a href="items.html">Browse Items</a>
+        <a href="about.html">About</a>
+        <a href="admin-login.html">Admin Portal</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <p style="font-size:13.5px; line-height:1.8;">For inquiries about seized items, use the messaging system on each item's detail page.</p>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 HondurasBorder Public Access Portal. Demo platform only.</div>
+  </footer>
+
+</body>
+</html>
