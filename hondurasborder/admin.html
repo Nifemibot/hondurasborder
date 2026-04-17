@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — HondurasBorder</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ── LAYOUT ── */
+    body { background: #f0f2f7; }
+
+    .dash-wrap {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 100vh;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      background: var(--navy-dark);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-brand {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .sidebar-brand h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      color: var(--white);
+      margin-bottom: 2px;
+    }
+
+    .sidebar-brand p { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+    .sidebar-section {
+      padding: 20px 12px 8px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.3);
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      margin: 2px 8px;
+      border-radius: 8px;
+      color: rgba(255,255,255,0.6);
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+      user-select: none;
+    }
+
+    .nav-item:hover { background: rgba(255,255,255,0.07); color: var(--white); }
+
+    .nav-item.active { background: rgba(255,255,255,0.12); color: var(--white); }
+
+    .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--gold);
+      color: var(--navy-dark);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 16px 12px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* ── MAIN AREA ── */
+    .main-area { padding: 28px 32px; overflow-y: auto; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── PAGE TITLE ── */
+    .page-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .page-title h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      color: var(--navy);
+    }
+
+    .page-title p { font-size: 13.5px; color: var(--gray-400); margin-top: 2px; }
+
+    /* ── STAT CARDS ── */
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      border: 1px solid var(--gray-200);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .stat-card-label { font-size: 12px; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-card-icon { font-size: 22px; }
+    .stat-card-value { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--navy); }
+    .stat-card-sub { font-size: 12px; color: var(--gray-400); margin-top: 4px; }
+
+    /* ── TOOLBAR ── */
+    .toolbar {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .toolbar-search {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
+
+    .toolbar-search input {
+      width: 100%;
+      padding: 9px 14px 9px 36px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      font-size: 13.5px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+      background: var(--off-white);
+    }
+
+    .toolbar-search input:focus { border-color: var(--navy); background: var(--white); }
+
+    .toolbar-search .search-icon {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: var(--gray-400);
+      pointer-events: none;
+    }
+
+    .toolbar select {
+      padding: 9px 12px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      font-size: 13.5px;
+      font-family: inherit;
+      outline: none;
+      background: var(--off-white);
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .toolbar select:focus { border-color: var(--navy); }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-200);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .table-scroll { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; min-width: 680px; }
+
+    thead { background: var(--off-white); }
+
+    th {
+      padding: 11px 16px;
+      text-align: left;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-400);
+      white-space: nowrap;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    td {
+      padding: 13px 16px;
+      font-size: 13.5px;
+      color: var(--text);
+      border-bottom: 1px solid var(--gray-100);
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: #f8f9fc; }
+
+    .table-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--gray-400);
+    }
+    .table-empty .empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+    /* ── ACTION BUTTONS ── */
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+    }
+    .btn-sm:hover { opacity: 0.8; }
+    .btn-edit    { background: var(--navy);       color: var(--white); }
+    .btn-delete  { background: #fee2e2;            color: #dc2626; }
+    .btn-view    { background: var(--off-white);   color: var(--navy); border: 1px solid var(--gray-200); }
+
+    .btn-actions { display: flex; gap: 6px; align-items: center; }
+
+    /* ── CATEGORY GRID ── */
+    .cat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .cat-card {
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+
+    .cat-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .cat-info h4 { font-size: 14px; font-weight: 700; color: var(--navy); }
+    .cat-info p  { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+
+    .cat-actions {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .cat-card:hover .cat-actions { opacity: 1; }
+
+    /* ── IMAGE UPLOAD ── */
+    .img-toggle {
+      display: flex;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .img-tab {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-right: 1.5px solid var(--gray-200);
+      background: var(--off-white);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--gray-600);
+      transition: all 0.2s;
+    }
+    .img-tab:last-child { border-right: none; }
+    .img-tab.active { background: var(--navy); color: var(--white); }
+
+    .img-panel { display: none; }
+    .img-panel.active { display: block; }
+
+    .drop-zone {
+      border: 2px dashed var(--gray-200);
+      border-radius: var(--radius);
+      padding: 32px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .drop-zone:hover, .drop-zone.over { border-color: var(--navy); background: #f0f4ff; }
+    .drop-zone input {
+      position: absolute; inset: 0;
+      opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .drop-zone .dz-icon { font-size: 32px; margin-bottom: 10px; }
+    .drop-zone p { font-size: 13px; color: var(--gray-400); margin: 4px 0; }
+    .drop-zone strong { color: var(--navy); }
+
+    .img-preview { display: none; margin-top: 10px; position: relative; }
+    .img-preview img {
+      width: 100%; height: 160px; object-fit: cover;
+      border-radius: var(--radius); border: 1px solid var(--gray-200);
+    }
+    .img-preview-rm {
+      position: absolute; top: 6px; right: 6px;
+      background: rgba(0,0,0,0.65); color: #fff;
+      border: none; border-radius: 50%;
+      width: 26px; height: 26px; cursor: pointer;
+      font-size: 13px; display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── MODAL ── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none; align-items: center; justify-content: center;
+      z-index: 500; padding: 20px;
+    }
+    .overlay.open { display: flex; }
+
+    .modal-box {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      width: 100%; max-width: 560px;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+
+    .modal-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 22px 28px 0;
+      position: sticky; top: 0; background: var(--white); z-index: 1;
+      padding-bottom: 16px; border-bottom: 1px solid var(--gray-100);
+    }
+
+    .modal-head h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--navy); }
+
+    .modal-close {
+      background: var(--off-white); border: none;
+      width: 32px; height: 32px; border-radius: 50%;
+      font-size: 16px; cursor: pointer; color: var(--gray-600);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .modal-close:hover { background: var(--gray-200); }
+
+    .modal-body { padding: 24px 28px 28px; }
+
+    /* ── MSG CARD ── */
+    .msg-card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.2s;
+    }
+    .msg-card.unread { border-left: 3px solid var(--gold); background: #fffef5; }
+    .msg-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .msg-sender { font-weight: 700; font-size: 14px; color: var(--navy); }
+    .msg-date { font-size: 12px; color: var(--gray-400); }
+    .msg-item { font-size: 12px; color: var(--gray-400); margin-bottom: 8px; }
+    .msg-email { font-size: 12.5px; color: var(--navy); font-weight: 500; }
+    .msg-text { font-size: 13.5px; color: var(--gray-600); line-height: 1.7; margin-top: 8px; }
+
+    /* ── MOBILE ── */
+    .mobile-toggle {
+      display: none;
+      background: none; border: none;
+      font-size: 22px; cursor: pointer;
+      color: var(--white); padding: 6px;
+    }
+
+    @media (max-width: 900px) {
+      .dash-wrap { grid-template-columns: 1fr; }
+
+      .sidebar {
+        position: fixed; top: 0; left: -260px;
+        width: 240px; z-index: 300;
+        transition: left 0.3s ease;
+        height: 100%;
+      }
+      .sidebar.open { left: 0; }
+
+      .sidebar-overlay {
+        display: none; position: fixed; inset: 0;
+        background: rgba(0,0,0,0.5); z-index: 299;
+      }
+      .sidebar-overlay.open { display: block; }
+
+      .mobile-toggle { display: flex; }
+
+      .main-area { padding: 20px 16px; }
+
+      .stat-cards { grid-template-columns: repeat(2, 1fr); }
+
+      .topbar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; background: var(--navy); padding: 12px 16px; border-radius: var(--radius-lg); }
+      .topbar h2 { font-family: 'Playfair Display',serif; color: var(--white); font-size: 16px; margin: 0; }
+
+      .cat-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .stat-cards { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .stat-card-value { font-size: 22px; }
+      .cat-grid { grid-template-columns: 1fr; }
+      .toolbar { gap: 8px; }
+      .toolbar-search { min-width: 100%; }
+    }
+  </style>
+</head>
+<body style="visibility:hidden;">
+
+<!-- Sidebar overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="dash-wrap">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span style="font-size:22px;">⚖️</span>
+        <div>
+          <h2>HondurasBorder</h2>
+          <p>Admin Dashboard</p>
+        </div>
+      </div>
+      <a href="index.html" style="font-size:12px;color:rgba(255,255,255,0.4);text-decoration:none;display:flex;align-items:center;gap:6px;">
+        ← Back to public site
+      </a>
+    </div>
+
+    <div class="sidebar-section">Overview</div>
+    <div class="nav-item active" onclick="showTab('overview',this)">
+      <span class="nav-icon">📊</span> Overview
+    </div>
+
+    <div class="sidebar-section">Manage</div>
+    <div class="nav-item" onclick="showTab('items',this)">
+      <span class="nav-icon">📦</span> Seized Items
+    </div>
+    <div class="nav-item" onclick="showTab('categories',this)">
+      <span class="nav-icon">🏷️</span> Categories
+    </div>
+    <div class="nav-item" onclick="showTab('messages',this)" id="msgNavItem">
+      <span class="nav-icon">💬</span> Messages
+      <span class="nav-badge" id="unreadCount" style="display:none;">0</span>
+    </div>
+
+    <div class="sidebar-footer">
+      <a href="index.html" style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.5);font-size:13px;text-decoration:none;padding:8px 4px;margin-bottom:14px;">
+        🌐 View Public Site
+      </a>
+      <button class="btn-sm btn-delete" onclick="logoutAdmin()" style="width:100%;justify-content:center;">Logout</button>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main class="main-area">
+
+    <!-- Mobile topbar -->
+    <div class="topbar" id="mobileTopbar" style="display:none;">
+      <button class="mobile-toggle" onclick="openSidebar()">☰</button>
+      <h2>Admin Dashboard</h2>
+      <button class="btn-sm btn-delete" style="margin-left:auto;" onclick="logoutAdmin()">Logout</button>
+    </div>
+
+    <!-- ══ OVERVIEW TAB ══ -->
+    <div class="tab-panel active" id="tab-overview">
+      <div class="page-title">
+        <div>
+          <h1>Overview</h1>
+          <p>Welcome to HondurasBorder Admin Dashboard</p>
+        </div>
+        <button class="btn-add" onclick="showTab('items', document.querySelector('[onclick*=items]'))">+ Add New Item</button>
+      </div>
+
+      <div class="stat-cards" id="statCards"></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" id="overviewGrids">
+        <!-- Recent items -->
+        <div class="table-wrap">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:center;">
+            <h3 style="font-size:15px;font-weight:700;color:var(--navy);">Recent Items</h3>
+            <span onclick="showTab('items',document.querySelectorAll('.nav-item')[2])" style="font-size:13px;color:var(--navy);cursor:pointer;font-weight:600;">View all →</span>
+          </div>
+          <div id="recentItems"></div>
+        </div>
+
+        <!-- Recent messages -->
+        <div class="table-wrap">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:center;">
+            <h3 style="font-size:15px;font-weight:700;color:var(--navy);">Recent Messages</h3>
+            <span onclick="showTab('messages',document.querySelectorAll('.nav-item')[3])" style="font-size:13px;color:var(--navy);cursor:pointer;font-weight:600;">View all →</span>
+          </div>
+          <div id="recentMsgs" style="padding:12px 16px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ITEMS TAB ══ -->
+    <div class="tab-panel" id="tab-items">
+      <div class="page-title">
+        <div>
+          <h1>Seized Items</h1>
+          <p id="itemsSubtitle">Loading...</p>
+        </div>
+        <button class="btn-add" onclick="openItemModal()">+ Add New Item</button>
+      </div>
+
+      <!-- Toolbar: search + filters -->
+      <div class="toolbar">
+        <div class="toolbar-search">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="itemSearch" placeholder="Search by title, ID, location..." oninput="renderItemsTable()" />
+        </div>
+        <select id="filterCategory" onchange="renderItemsTable()">
+          <option value="All">All Categories</option>
+        </select>
+        <select id="filterStatus" onchange="renderItemsTable()">
+          <option value="All">All Statuses</option>
+          <option>Seized</option>
+          <option>Under Review</option>
+          <option>Available</option>
+        </select>
+        <button class="btn-add" style="padding:9px 16px;font-size:13px;" onclick="clearItemFilters()">Clear</button>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Location</th>
+                <th>Value</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="itemsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CATEGORIES TAB ══ -->
+    <div class="tab-panel" id="tab-categories">
+      <div class="page-title">
+        <div>
+          <h1>Categories</h1>
+          <p>Manage item categories shown on the public site</p>
+        </div>
+        <button class="btn-add" onclick="openCatModal()">+ Add Category</button>
+      </div>
+
+      <div class="cat-grid" id="catGrid"></div>
+
+      <div class="table-wrap" style="margin-top:8px;">
+        <div style="padding:14px 20px;border-bottom:1px solid var(--gray-100);">
+          <h3 style="font-size:14px;font-weight:700;color:var(--navy);">Items per Category</h3>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>Category</th><th>Total Items</th><th>Seized</th><th>Under Review</th><th>Available</th></tr>
+            </thead>
+            <tbody id="catStatsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MESSAGES TAB ══ -->
+    <div class="tab-panel" id="tab-messages">
+      <div class="page-title">
+        <div>
+          <h1>Messages</h1>
+          <p id="msgSubtitle">Loading...</p>
+        </div>
+        <button class="btn-add" style="background:#e5e7eb;color:var(--navy);" onclick="markAllMsgsRead()">✓ Mark All Read</button>
+      </div>
+
+      <!-- Message toolbar -->
+      <div class="toolbar">
+        <div class="toolbar-search">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="msgSearch" placeholder="Search messages..." oninput="renderMessages()" />
+        </div>
+        <select id="msgFilter" onchange="renderMessages()">
+          <option value="All">All Messages</option>
+          <option value="Unread">Unread Only</option>
+          <option value="Read">Read Only</option>
+        </select>
+      </div>
+
+      <div id="msgList"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══ ITEM MODAL ══ -->
+<div class="overlay" id="itemOverlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="itemModalTitle">Add New Item</h3>
+      <button class="modal-close" onclick="closeItemModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="fId" />
+
+      <div class="form-group">
+        <label>Title *</label>
+        <input type="text" id="fTitle" placeholder="e.g. 2024 Mercedes-Benz E-Class" />
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="form-group">
+          <label>Category *</label>
+          <select id="fCategory"></select>
+        </div>
+        <div class="form-group">
+          <label>Status *</label>
+          <select id="fStatus">
+            <option>Seized</option>
+            <option>Under Review</option>
+            <option>Available</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Location *</label>
+        <input type="text" id="fLocation" placeholder="e.g. Federal Impound Lot, Washington D.C." />
+      </div>
+
+      <div class="form-group">
+        <label>Estimated Value (USD) *</label>
+        <input type="number" id="fValue" placeholder="e.g. 58000" min="0" />
+      </div>
+
+      <div class="form-group">
+        <label>Description *</label>
+        <textarea id="fDesc" rows="3" placeholder="Describe the item..."></textarea>
+      </div>
+
+      <!-- Image -->
+      <div class="form-group">
+        <label>Item Image</label>
+        <div class="img-toggle">
+          <button class="img-tab active" id="urlTabBtn" onclick="setImgMode('url',this)">🔗 Image URL</button>
+          <button class="img-tab" id="fileTabBtn" onclick="setImgMode('file',this)">📁 Upload from PC</button>
+        </div>
+
+        <div class="img-panel active" id="urlPanel">
+          <input type="url" id="fImgUrl" placeholder="https://example.com/photo.jpg" oninput="previewUrl(this.value)" />
+          <div class="img-preview" id="urlPrev">
+            <img id="urlPrevImg" src="" alt="preview" onerror="this.parentElement.style.display='none'" />
+            <button class="img-preview-rm" onclick="clearUrl()">✕</button>
+          </div>
+        </div>
+
+        <div class="img-panel" id="filePanel">
+          <div class="drop-zone" id="dropZone">
+            <input type="file" id="fImgFile" accept="image/jpeg,image/png,image/webp,image/gif" onchange="handleFile(this)" />
+            <div class="dz-icon">📂</div>
+            <p><strong>Click to browse</strong> or drag & drop here</p>
+            <p>JPG · PNG · WEBP · GIF — max 5 MB</p>
+          </div>
+          <div class="img-preview" id="filePrev">
+            <img id="filePrevImg" src="" alt="preview" />
+            <button class="img-preview-rm" onclick="clearFile()">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" style="display:flex;align-items:center;gap:10px;">
+        <input type="checkbox" id="fFeatured" style="width:auto;cursor:pointer;" />
+        <label for="fFeatured" style="margin:0;cursor:pointer;font-size:13.5px;">Feature on homepage</label>
+      </div>
+
+      <div class="error-msg" id="itemErr"></div>
+
+      <div style="display:flex;gap:10px;margin-top:4px;">
+        <button class="btn-primary" onclick="saveItem()" style="flex:1;">Save Item</button>
+        <button onclick="closeItemModal()" style="padding:12px 20px;border:1.5px solid var(--gray-200);border-radius:var(--radius);background:none;cursor:pointer;font-family:inherit;font-size:14px;">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CATEGORY MODAL ══ -->
+<div class="overlay" id="catOverlay">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-head">
+      <h3 id="catModalTitle">Add Category</h3>
+      <button class="modal-close" onclick="closeCatModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="cId" />
+      <div class="form-group">
+        <label>Category Name *</label>
+        <input type="text" id="cName" placeholder="e.g. Aircraft" />
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="form-group">
+          <label>Icon (emoji) *</label>
+          <input type="text" id="cIcon" placeholder="e.g. ✈️" maxlength="4" style="font-size:20px;" />
+        </div>
+        <div class="form-group">
+          <label>Color *</label>
+          <input type="color" id="cColor" value="#3b82f6" style="height:42px;padding:2px 4px;" />
+        </div>
+      </div>
+      <div class="error-msg" id="catErr"></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-primary" onclick="saveCat()" style="flex:1;">Save Category</button>
+        <button onclick="closeCatModal()" style="padding:12px 20px;border:1.5px solid var(--gray-200);border-radius:var(--radius);background:none;cursor:pointer;font-family:inherit;font-size:14px;">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script>
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+let imgMode = 'url';
+let fileBase64 = '';
+
+window.addEventListener('load', () => {
+  if (DB && typeof DB.init === 'function') DB.init();
+  const isLoggedIn = DB.isLoggedIn();
+  if (!isLoggedIn || isLoggedIn !== true) {
+    window.location.href = 'admin-login.html';
+    return;
+  }
+  document.body.style.visibility = 'visible';
+  updateUnreadBadge();
+  renderOverview();
+  populateCategoryFilters();
+  renderItemsTable();
+  renderCategories();
+  renderMessages();
+  checkMobile();
+});
+
+window.addEventListener('resize', checkMobile);
+
+function logoutAdmin() {
+  DB.logout();
+  window.location.href = 'admin-login.html';
+}
+
+function checkMobile() {
+  const isMobile = window.innerWidth <= 900;
+  document.getElementById('mobileTopbar').style.display = isMobile ? 'flex' : 'none';
+}
+
+// ═══════════════════════════════════════
+//  SIDEBAR (mobile)
+// ═══════════════════════════════════════
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+// ═══════════════════════════════════════
+//  TAB NAVIGATION
+// ═══════════════════════════════════════
+function showTab(name, el) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+  closeSidebar();
+  if (name === 'messages') { markAllMsgsRead(); renderMessages(); }
+  if (name === 'overview') renderOverview();
+}
+
+// ═══════════════════════════════════════
+//  UNREAD BADGE
+// ═══════════════════════════════════════
+function updateUnreadBadge() {
+  const count = DB.getUnreadCount();
+  const el = document.getElementById('unreadCount');
+  if (count > 0) { el.textContent = count; el.style.display = 'inline'; }
+  else el.style.display = 'none';
+}
+
+// ═══════════════════════════════════════
+//  OVERVIEW
+// ═══════════════════════════════════════
+function renderOverview() {
+  const s = DB.getStats();
+
+  document.getElementById('statCards').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-card-top"><span class="stat-card-label">Total Items</span><span class="stat-card-icon">📦</span></div>
+      <div class="stat-card-value">${s.total}</div>
+      <div class="stat-card-sub">${s.seized} seized · ${s.available} available</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-top"><span class="stat-card-label">Total Value</span><span class="stat-card-icon">💰</span></div>
+      <div class="stat-card-value">${DB.formatCurrency(s.totalValue)}</div>
+      <div class="stat-card-sub">Estimated total</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-top"><span class="stat-card-label">Messages</span><span class="stat-card-icon">💬</span></div>
+      <div class="stat-card-value">${s.messages}</div>
+      <div class="stat-card-sub">${s.unread} unread</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-top"><span class="stat-card-label">Categories</span><span class="stat-card-icon">🏷️</span></div>
+      <div class="stat-card-value">${DB.getCategories().length}</div>
+      <div class="stat-card-sub">Active categories</div>
+    </div>
+  `;
+
+  // Recent items
+  const items = DB.getItems().slice(0, 5);
+  document.getElementById('recentItems').innerHTML = items.length === 0
+    ? '<p style="padding:20px;text-align:center;color:var(--gray-400);">No items yet.</p>'
+    : items.map(item => `
+      <div style="padding:12px 20px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:12px;">
+        <div style="width:36px;height:36px;border-radius:8px;overflow:hidden;flex-shrink:0;background:var(--off-white);display:flex;align-items:center;justify-content:center;font-size:18px;">
+          ${item.image ? `<img src="${item.image}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='${DB.getCategoryMeta(item.category).icon}'" />` : DB.getCategoryMeta(item.category).icon}
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;font-size:13.5px;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.title}</div>
+          <div style="font-size:12px;color:var(--gray-400);">${DB.formatCurrency(item.value)}</div>
+        </div>
+        <span class="badge ${DB.badgeClass(item.status)}" style="font-size:11px;">${item.status}</span>
+      </div>`).join('');
+
+  // Recent messages
+  const msgs = DB.getMessages().slice(0, 4);
+  document.getElementById('recentMsgs').innerHTML = msgs.length === 0
+    ? '<p style="text-align:center;color:var(--gray-400);padding:20px 0;">No messages yet.</p>'
+    : msgs.map(m => `
+      <div style="padding:10px 0;border-bottom:1px solid var(--gray-100);">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-weight:600;font-size:13px;color:var(--navy);">${m.name} ${!m.read ? '<span class="unread-dot"></span>' : ''}</span>
+          <span style="font-size:11px;color:var(--gray-400);">${DB.formatDate(m.date)}</span>
+        </div>
+        <div style="font-size:12px;color:var(--gray-400);margin-top:2px;">${m.itemTitle || 'General inquiry'}</div>
+        <div style="font-size:13px;color:var(--gray-600);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.message}</div>
+      </div>`).join('');
+}
+
+// ═══════════════════════════════════════
+//  ITEMS TABLE
+// ═══════════════════════════════════════
+function populateCategoryFilters() {
+  const cats = DB.getCategories();
+  const catSel = document.getElementById('filterCategory');
+  const fCat   = document.getElementById('fCategory');
+
+  catSel.innerHTML = '<option value="All">All Categories</option>' +
+    cats.map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`).join('');
+
+  fCat.innerHTML = '<option value="">Select category</option>' +
+    cats.map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`).join('');
+}
+
+function renderItemsTable() {
+  const search   = document.getElementById('itemSearch').value;
+  const category = document.getElementById('filterCategory').value;
+  const status   = document.getElementById('filterStatus').value;
+  const items    = DB.getItems({ search, category, status });
+
+  document.getElementById('itemsSubtitle').textContent =
+    `${items.length} item${items.length !== 1 ? 's' : ''} found`;
+
+  const tbody = document.getElementById('itemsTableBody');
+  if (!items.length) {
+    tbody.innerHTML = `<tr><td colspan="8">
+      <div class="table-empty">
+        <div class="empty-icon">🔍</div>
+        <p>No items match your search.</p>
+      </div>
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = items.map(item => {
+    const cat = DB.getCategoryMeta(item.category);
+    return `<tr>
+      <td style="font-size:11.5px;color:var(--gray-400);font-weight:700;">${item.id}</td>
+      <td>
+        <div style="width:44px;height:44px;border-radius:8px;overflow:hidden;background:var(--off-white);display:flex;align-items:center;justify-content:center;font-size:20px;">
+          ${item.image
+            ? `<img src="${item.image}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='${cat.icon}'" />`
+            : cat.icon}
+        </div>
+      </td>
+      <td style="font-weight:600;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.title}</td>
+      <td>
+        <span style="display:inline-flex;align-items:center;gap:5px;font-size:12.5px;background:${cat.color}18;color:${cat.color};padding:3px 10px;border-radius:20px;font-weight:600;">
+          ${cat.icon} ${item.category}
+        </span>
+      </td>
+      <td><span class="badge ${DB.badgeClass(item.status)}">${item.status}</span></td>
+      <td style="font-size:12.5px;color:var(--gray-600);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📍 ${item.location}</td>
+      <td style="font-weight:700;white-space:nowrap;">${DB.formatCurrency(item.value)}</td>
+      <td>
+        <div class="btn-actions">
+          <button class="btn-sm btn-edit"   onclick="openEditItem('${item.id}')">Edit</button>
+          <button class="btn-sm btn-delete" onclick="deleteItem('${item.id}')">Delete</button>
+          <a href="items-details.html?id=${item.id}" target="_blank" class="btn-sm btn-view">View</a>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function clearItemFilters() {
+  document.getElementById('itemSearch').value = '';
+  document.getElementById('filterCategory').value = 'All';
+  document.getElementById('filterStatus').value   = 'All';
+  renderItemsTable();
+}
+
+function deleteItem(id) {
+  if (!confirm('Delete this item? This cannot be undone.')) return;
+  DB.deleteItem(id);
+  renderItemsTable();
+  renderOverview();
+}
+
+// ═══════════════════════════════════════
+//  ITEM MODAL
+// ═══════════════════════════════════════
+function openItemModal() {
+  document.getElementById('itemModalTitle').textContent = 'Add New Item';
+  ['fId','fTitle','fLocation','fValue','fDesc','fImgUrl'].forEach(id =>
+    document.getElementById(id).value = '');
+  document.getElementById('fCategory').value  = '';
+  document.getElementById('fStatus').value    = 'Seized';
+  document.getElementById('fFeatured').checked = false;
+  document.getElementById('itemErr').style.display = 'none';
+  clearUrl(); clearFile();
+  setImgMode('url', document.getElementById('urlTabBtn'));
+  document.getElementById('itemOverlay').classList.add('open');
+}
+
+function openEditItem(id) {
+  const item = DB.getItem(id);
+  if (!item) return;
+  document.getElementById('itemModalTitle').textContent = 'Edit Item';
+  document.getElementById('fId').value        = item.id;
+  document.getElementById('fTitle').value     = item.title;
+  document.getElementById('fCategory').value  = item.category;
+  document.getElementById('fStatus').value    = item.status;
+  document.getElementById('fLocation').value  = item.location;
+  document.getElementById('fValue').value     = item.value;
+  document.getElementById('fDesc').value      = item.description || '';
+  document.getElementById('fFeatured').checked = !!item.featured;
+  document.getElementById('itemErr').style.display = 'none';
+
+  clearUrl(); clearFile();
+  if (item.image && item.image.startsWith('data:')) {
+    setImgMode('file', document.getElementById('fileTabBtn'));
+    fileBase64 = item.image;
+    document.getElementById('filePrevImg').src = item.image;
+    document.getElementById('filePrev').style.display = 'block';
+  } else {
+    setImgMode('url', document.getElementById('urlTabBtn'));
+    document.getElementById('fImgUrl').value = item.image || '';
+    if (item.image) previewUrl(item.image);
+  }
+  document.getElementById('itemOverlay').classList.add('open');
+}
+
+function closeItemModal() {
+  document.getElementById('itemOverlay').classList.remove('open');
+}
+
+function saveItem() {
+  const id          = document.getElementById('fId').value;
+  const title       = document.getElementById('fTitle').value.trim();
+  const category    = document.getElementById('fCategory').value;
+  const status      = document.getElementById('fStatus').value;
+  const location    = document.getElementById('fLocation').value.trim();
+  const value       = document.getElementById('fValue').value;
+  const description = document.getElementById('fDesc').value.trim();
+  const featured    = document.getElementById('fFeatured').checked;
+  const errEl       = document.getElementById('itemErr');
+
+  errEl.style.display = 'none';
+
+  if (!title || !category || !location || !value || !description) {
+    errEl.textContent = 'Please fill in all required fields.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const image = imgMode === 'url'
+    ? document.getElementById('fImgUrl').value.trim()
+    : fileBase64;
+
+  DB.saveItem({ id: id || null, title, category, status, location, value: Number(value), description, image, featured });
+  closeItemModal();
+  renderItemsTable();
+  renderOverview();
+}
+
+// ═══════════════════════════════════════
+//  IMAGE HANDLING
+// ═══════════════════════════════════════
+function setImgMode(mode, btn) {
+  imgMode = mode;
+  document.querySelectorAll('.img-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('urlPanel').classList.toggle('active', mode === 'url');
+  document.getElementById('filePanel').classList.toggle('active', mode === 'file');
+}
+
+function previewUrl(url) {
+  const prev = document.getElementById('urlPrev');
+  const img  = document.getElementById('urlPrevImg');
+  if (url) { img.src = url; prev.style.display = 'block'; }
+  else prev.style.display = 'none';
+}
+
+function clearUrl() {
+  document.getElementById('fImgUrl').value = '';
+  document.getElementById('urlPrev').style.display = 'none';
+}
+
+function handleFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Image must be under 5MB. Please choose a smaller file.');
+    input.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    fileBase64 = e.target.result;
+    document.getElementById('filePrevImg').src = fileBase64;
+    document.getElementById('filePrev').style.display = 'block';
+  };
+  reader.onerror = () => alert('Failed to read the image file. Please try again.');
+  reader.readAsDataURL(file);
+}
+
+function clearFile() {
+  const inp = document.getElementById('fImgFile');
+  if (inp) inp.value = '';
+  document.getElementById('filePrev').style.display = 'none';
+  fileBase64 = '';
+}
+
+// Drag & drop
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('over');
+  const file = e.dataTransfer.files[0];
+  if (!file || !file.type.startsWith('image/')) { alert('Please drop an image file.'); return; }
+  try {
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    document.getElementById('fImgFile').files = dt.files;
+    handleFile(document.getElementById('fImgFile'));
+  } catch(e) {
+    // DataTransfer not supported — read directly
+    const reader = new FileReader();
+    reader.onload = ev => {
+      fileBase64 = ev.target.result;
+      document.getElementById('filePrevImg').src = fileBase64;
+      document.getElementById('filePrev').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// ═══════════════════════════════════════
+//  CATEGORIES
+// ═══════════════════════════════════════
+function renderCategories() {
+  const cats  = DB.getCategories();
+  const items = DB.getItems();
+
+  document.getElementById('catGrid').innerHTML = cats.map(cat => {
+    const count = items.filter(i => i.category === cat.name).length;
+    return `
+      <div class="cat-card">
+        <div class="cat-icon-box" style="background:${cat.color}18;">
+          <span style="font-size:22px;">${cat.icon}</span>
+        </div>
+        <div class="cat-info">
+          <h4>${cat.name}</h4>
+          <p>${count} item${count !== 1 ? 's' : ''}</p>
+        </div>
+        <div class="cat-actions">
+          <button class="btn-sm btn-edit" onclick="openEditCat('${cat.id}')">Edit</button>
+          <button class="btn-sm btn-delete" onclick="deleteCat('${cat.id}','${cat.name}')">✕</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Stats table
+  document.getElementById('catStatsTable').innerHTML = cats.map(cat => {
+    const catItems = items.filter(i => i.category === cat.name);
+    return `<tr>
+      <td><span style="display:inline-flex;align-items:center;gap:6px;">${cat.icon} ${cat.name}</span></td>
+      <td style="font-weight:700;">${catItems.length}</td>
+      <td><span class="badge badge-seized">${catItems.filter(i=>i.status==='Seized').length}</span></td>
+      <td><span class="badge badge-review">${catItems.filter(i=>i.status==='Under Review').length}</span></td>
+      <td><span class="badge badge-available">${catItems.filter(i=>i.status==='Available').length}</span></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--gray-400);">No categories yet.</td></tr>';
+}
+
+function openCatModal() {
+  document.getElementById('catModalTitle').textContent = 'Add Category';
+  document.getElementById('cId').value   = '';
+  document.getElementById('cName').value = '';
+  document.getElementById('cIcon').value = '';
+  document.getElementById('cColor').value = '#3b82f6';
+  document.getElementById('catErr').style.display = 'none';
+  document.getElementById('catOverlay').classList.add('open');
+}
+
+function openEditCat(id) {
+  const cat = DB.getCategories().find(c => c.id === id);
+  if (!cat) return;
+  document.getElementById('catModalTitle').textContent = 'Edit Category';
+  document.getElementById('cId').value    = cat.id;
+  document.getElementById('cName').value  = cat.name;
+  document.getElementById('cIcon').value  = cat.icon;
+  document.getElementById('cColor').value = cat.color || '#3b82f6';
+  document.getElementById('catErr').style.display = 'none';
+  document.getElementById('catOverlay').classList.add('open');
+}
+
+function closeCatModal() {
+  document.getElementById('catOverlay').classList.remove('open');
+}
+
+function saveCat() {
+  const id    = document.getElementById('cId').value;
+  const name  = document.getElementById('cName').value.trim();
+  const icon  = document.getElementById('cIcon').value.trim();
+  const color = document.getElementById('cColor').value;
+  const errEl = document.getElementById('catErr');
+  errEl.style.display = 'none';
+
+  if (!name || !icon) {
+    errEl.textContent = 'Name and icon are required.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  DB.saveCategory({ id: id || null, name, icon, color });
+  closeCatModal();
+  renderCategories();
+  populateCategoryFilters();
+}
+
+function deleteCat(id, name) {
+  const items = DB.getItems({ category: name });
+  if (items.length > 0) {
+    alert(`Cannot delete "${name}" — it has ${items.length} item(s). Reassign or delete those items first.`);
+    return;
+  }
+  if (!confirm(`Delete category "${name}"?`)) return;
+  DB.deleteCategory(id);
+  renderCategories();
+  populateCategoryFilters();
+}
+
+// ═══════════════════════════════════════
+//  MESSAGES
+// ═══════════════════════════════════════
+function renderMessages() {
+  const search = document.getElementById('msgSearch').value.toLowerCase();
+  const filter = document.getElementById('msgFilter').value;
+  let msgs     = DB.getMessages();
+
+  if (search) msgs = msgs.filter(m =>
+    m.name.toLowerCase().includes(search) ||
+    m.email.toLowerCase().includes(search) ||
+    m.message.toLowerCase().includes(search) ||
+    (m.itemTitle||'').toLowerCase().includes(search)
+  );
+  if (filter === 'Unread') msgs = msgs.filter(m => !m.read);
+  if (filter === 'Read')   msgs = msgs.filter(m => m.read);
+
+  document.getElementById('msgSubtitle').textContent =
+    `${msgs.length} message${msgs.length !== 1 ? 's' : ''}`;
+
+  const el = document.getElementById('msgList');
+  if (!msgs.length) {
+    el.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--gray-400);">
+      <div style="font-size:40px;margin-bottom:12px;">💬</div>
+      <p>No messages found.</p>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = msgs.map(m => `
+    <div class="msg-card ${!m.read ? 'unread' : ''}">
+      <div class="msg-card-top">
+        <div>
+          <div class="msg-sender">${m.name} ${!m.read ? '<span class="unread-dot"></span>' : ''}</div>
+          <div class="msg-email">${m.email}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="msg-date">${DB.formatDate(m.date)}</div>
+          <button class="btn-sm btn-delete" style="margin-top:6px;" onclick="deleteMsg('${m.id}')">Delete</button>
+        </div>
+      </div>
+      <div class="msg-item">Re: <strong>${m.itemTitle || 'General inquiry'}</strong></div>
+      <div class="msg-text">${m.message}</div>
+      ${!m.read ? `<button class="btn-sm btn-view" style="margin-top:10px;" onclick="markMsgRead('${m.id}')">✓ Mark as Read</button>` : ''}
+    </div>
+  `).join('');
+}
+
+function markAllMsgsRead() {
+  DB.getMessages().forEach(m => { if (!m.read) DB.markMessageRead(m.id); });
+  renderMessages();
+  updateUnreadBadge();
+}
+
+function markMsgRead(id) {
+  DB.markMessageRead(id);
+  renderMessages();
+  updateUnreadBadge();
+}
+
+function deleteMsg(id) {
+  if (!confirm('Delete this message?')) return;
+  DB.deleteMessage(id);
+  renderMessages();
+  updateUnreadBadge();
+}
+
+// Close modals on overlay click
+document.getElementById('itemOverlay').addEventListener('click', function(e) { if (e.target === this) closeItemModal(); });
+document.getElementById('catOverlay').addEventListener('click',  function(e) { if (e.target === this) closeCatModal();  });
+</script>
+</body>
+</html> 
