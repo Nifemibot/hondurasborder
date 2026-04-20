@@ -44,15 +44,26 @@ app.use((err, req, res, next) => {
 // ── START SERVER ──
 const PORT = process.env.PORT || 5000;
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
+const connectDB = async () => {
+  if (!process.env.MONGO_URI) {
+    console.error("❌ MONGO_URI is missing in environment variables");
+    return;
+  }
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
     console.log("✅ MongoDB connected successfully");
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
-    });
-  })
-  .catch((err) => {
+  } catch (err) {
     console.error("❌ MongoDB connection failed:", err.message);
-    console.error("👉 Make sure your MONGO_URI in .env is correct");
-    process.exit(1);
+  }
+};
+
+connectDB();
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
   });
+}
+
+// Export the app for Vercel serverless function
+module.exports = app;
